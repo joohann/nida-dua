@@ -1,0 +1,31 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Nida Dua instellen",
+        "description": "Configureer welke mediaspeler en volume gebruikt worden voor het afspelen van duas.",
+        "data": {
+          "speaker": "Mediaspeler (entity_id)",
+          "volume": "Volume (0–100)"
+        }
+      }
+    },
+    "error": {
+      "invalid_speaker": "Voer een geldige mediaspeler entity_id in (bijv. media_player.woonkamer)"
+    },
+    "abort": {
+      "already_configured": "Nida Dua is al geconfigureerd"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Nida Dua opties",
+        "data": {
+          "speaker": "Mediaspeler (entity_id)",
+          "volume": "Volume (0–100)"
+        }
+      }
+    }
+  }
+}

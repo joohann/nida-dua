@@ -1,0 +1,30 @@
+"""Nida Dua — constants."""
+
+DOMAIN = "nida_dua"
+
+CONF_SPEAKER = "speaker"
+CONF_VOLUME = "volume"
+
+DUA_SLEEP = "sleep"
+
+DUA_ENTER_HOME = "enter_home"
+
+DUAS: dict[str, dict] = {
+    DUA_SLEEP: {
+        "name": "Slaap dua",
+        "name_en": "Sleep dua",
+        "arabic": "اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا",
+        "transliteration": "Allahumma bismika amutu wa ahya",
+        "sound": "dua_sleep.mp3",
+    },
+    DUA_ENTER_HOME: {
+        "name": "Binnenkomen huis dua",
+        "name_en": "Enter home dua",
+        "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلَجِ وَخَيْرَ الْمَخْرَجِ",
+        "transliteration": "Allahumma inni as'aluka khayral mawlaji wa khayral makhraji",
+        "sound": "dua_enter_home.mp3",
+    },
+}
+
+DEFAULT_VOLUME = 0.4
+DEFAULT_SPEAKER = "media_player.adhan_speakers"
