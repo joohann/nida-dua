@@ -25,9 +25,13 @@ _SOUND_BASE = "/local/nida_dua/sounds"
 
 def get_sound_url(hass: HomeAssistant, filename: str) -> str:
     """Bouw de volledige lokale URL voor een geluidsbestand."""
-    base = hass.config.api.base_url.rstrip("/") if hass.config.api else ""
+    base = (hass.config.internal_url or hass.config.external_url or "").rstrip("/")
+    if not base and hass.config.api:
+        api = hass.config.api
+        scheme = "https" if api.use_ssl else "http"
+        base = f"{scheme}://{api.host}:{api.port}"
     if not base:
-        base = (hass.config.internal_url or hass.config.external_url or "http://homeassistant.local:8123").rstrip("/")
+        base = "http://homeassistant.local:8123"
     return f"{base}{_SOUND_BASE}/{filename}"
 
 
