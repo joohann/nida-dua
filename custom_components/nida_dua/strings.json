@@ -2,16 +2,24 @@
   "config": {
     "step": {
       "user": {
-        "title": "Nida Dua instellen",
-        "description": "Configureer welke mediaspeler en volume gebruikt worden voor het afspelen van duas.",
+        "title": "Nida Dua — Mediaspeler & volume",
+        "description": "Selecteer je mediaspeler(s) en stel het volume in.",
         "data": {
-          "speaker": "Mediaspeler (entity_id)",
-          "volume": "Volume (0–100)"
+          "speaker": "Mediaspeler(s)",
+          "volume": "Dag volume (0–100)",
+          "evening_enabled": "Avondmodus inschakelen",
+          "evening_volume": "Avond volume (0–100)",
+          "evening_start_hour": "Avond begint om (uur)",
+          "evening_end_hour": "Avond eindigt om (uur)"
+        }
+      },
+      "duas": {
+        "title": "Nida Dua — Welke duas wil je gebruiken?",
+        "data": {
+          "enabled_sleep": "Slaap dua",
+          "enabled_enter_home": "Binnenkomen huis dua"
         }
       }
-    },
-    "error": {
-      "invalid_speaker": "Voer een geldige mediaspeler entity_id in (bijv. media_player.woonkamer)"
     },
     "abort": {
       "already_configured": "Nida Dua is al geconfigureerd"
@@ -20,10 +28,21 @@
   "options": {
     "step": {
       "init": {
-        "title": "Nida Dua opties",
+        "title": "Nida Dua — Mediaspeler & volume",
         "data": {
-          "speaker": "Mediaspeler (entity_id)",
-          "volume": "Volume (0–100)"
+          "speaker": "Mediaspeler(s)",
+          "volume": "Dag volume (0–100)",
+          "evening_enabled": "Avondmodus inschakelen",
+          "evening_volume": "Avond volume (0–100)",
+          "evening_start_hour": "Avond begint om (uur)",
+          "evening_end_hour": "Avond eindigt om (uur)"
+        }
+      },
+      "duas": {
+        "title": "Nida Dua — Welke duas wil je gebruiken?",
+        "data": {
+          "enabled_sleep": "Slaap dua",
+          "enabled_enter_home": "Binnenkomen huis dua"
         }
       }
     }

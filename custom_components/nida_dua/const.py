@@ -4,9 +4,12 @@ DOMAIN = "nida_dua"
 
 CONF_SPEAKER = "speaker"
 CONF_VOLUME = "volume"
+CONF_EVENING_ENABLED = "evening_enabled"
+CONF_EVENING_VOLUME = "evening_volume"
+CONF_EVENING_START = "evening_start_hour"
+CONF_EVENING_END = "evening_end_hour"
 
 DUA_SLEEP = "sleep"
-
 DUA_ENTER_HOME = "enter_home"
 
 DUAS: dict[str, dict] = {
@@ -26,5 +29,12 @@ DUAS: dict[str, dict] = {
     },
 }
 
-DEFAULT_VOLUME = 0.4
+DEFAULT_VOLUME = 40          # percent
+DEFAULT_EVENING_VOLUME = 20  # percent
+DEFAULT_EVENING_START = 21   # hour
+DEFAULT_EVENING_END = 7      # hour
 DEFAULT_SPEAKER: list[str] = []
+
+
+def conf_dua_enabled(dua_key: str) -> str:
+    return f"enabled_{dua_key}"
