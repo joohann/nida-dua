@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import socket
 
 from homeassistant.core import HomeAssistant
 
@@ -12,8 +13,17 @@ _SOUND_BASE = "/local/nida_dua/sounds"
 
 def get_sound_url(hass: HomeAssistant, filename: str) -> str:
     """Bouw de volledige lokale URL voor een geluidsbestand."""
-    base = hass.config.api.base_url.rstrip("/") if hass.config.api else ""
-    return f"{base}{_SOUND_BASE}/{filename}"
+    base = hass.config.internal_url or hass.config.external_url
+    if not base:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+        except Exception:
+            ip = "127.0.0.1"
+        base = f"http://{ip}:8123"
+    return f"{base.rstrip('/')}{_SOUND_BASE}/{filename}"
 
 
 async def async_play_dua(
