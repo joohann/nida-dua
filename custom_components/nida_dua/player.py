@@ -56,13 +56,15 @@ def get_current_volume(opts: dict) -> float:
 
 async def async_play_dua(
     hass: HomeAssistant,
-    speakers: list[str],
+    speakers: list[str] | str,
     sound_url: str,
     volume: float,
 ) -> None:
     """Speel een dua af op de opgegeven mediaspelers."""
+    if isinstance(speakers, str):
+        speakers = [s.strip() for s in speakers.split(",") if s.strip()]
     if not speakers:
-        _LOGGER.warning("Nida Dua: geen mediaspeler geconfigureerd")
+        _LOGGER.warning("Nida Dua: geen mediaspeler geconfigureerd — stel deze in via Instellingen → Integraties → Nida Dua → Configureren")
         return
 
     _LOGGER.debug("Nida Dua: afspelen op %s — %s (vol %.0f%%)", speakers, sound_url, volume * 100)
