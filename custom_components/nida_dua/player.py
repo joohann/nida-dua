@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-import socket
 
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
@@ -26,17 +25,10 @@ _SOUND_BASE = "/local/nida_dua/sounds"
 
 def get_sound_url(hass: HomeAssistant, filename: str) -> str:
     """Bouw de volledige lokale URL voor een geluidsbestand."""
-    base = hass.config.internal_url or hass.config.external_url
+    base = hass.config.api.base_url.rstrip("/") if hass.config.api else ""
     if not base:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect(("8.8.8.8", 80))
-            ip = s.getsockname()[0]
-            s.close()
-        except Exception:
-            ip = "127.0.0.1"
-        base = f"http://{ip}:8123"
-    return f"{base.rstrip('/')}{_SOUND_BASE}/{filename}"
+        base = (hass.config.internal_url or hass.config.external_url or "http://homeassistant.local:8123").rstrip("/")
+    return f"{base}{_SOUND_BASE}/{filename}"
 
 
 def get_current_volume(opts: dict) -> float:
@@ -50,15 +42,12 @@ def get_current_volume(opts: dict) -> float:
     start = int(opts.get(CONF_EVENING_START, DEFAULT_EVENING_START))
     end = int(opts.get(CONF_EVENING_END, DEFAULT_EVENING_END))
 
-    # Avond kan over middernacht lopen (bijv. 21:00–07:00)
     if start > end:
         in_evening = hour >= start or hour < end
     else:
         in_evening = start <= hour < end
 
-    if in_evening:
-        return float(opts.get(CONF_EVENING_VOLUME, DEFAULT_EVENING_VOLUME)) / 100
-    return day_vol
+    return float(opts.get(CONF_EVENING_VOLUME, DEFAULT_EVENING_VOLUME)) / 100 if in_evening else day_vol
 
 
 async def async_play_dua(
@@ -68,13 +57,19 @@ async def async_play_dua(
     volume: float,
 ) -> None:
     """Speel een dua af op de opgegeven mediaspelers."""
+    if not speakers:
+        _LOGGER.warning("Nida Dua: geen mediaspeler geconfigureerd")
+        return
+
+    _LOGGER.debug("Nida Dua: afspelen op %s — %s (vol %.0f%%)", speakers, sound_url, volume * 100)
+
     for entity_id in speakers:
         try:
             await hass.services.async_call(
                 "media_player",
                 "volume_set",
                 {"entity_id": entity_id, "volume_level": volume},
-                blocking=False,
+                blocking=True,
             )
             await hass.services.async_call(
                 "media_player",
@@ -84,7 +79,7 @@ async def async_play_dua(
                     "media_content_id": sound_url,
                     "media_content_type": "music",
                 },
-                blocking=False,
+                blocking=True,
             )
         except Exception:
-            _LOGGER.exception("Kon dua niet afspelen op %s", entity_id)
+            _LOGGER.exception("Nida Dua: kon dua niet afspelen op %s", entity_id)

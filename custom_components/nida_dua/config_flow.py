@@ -63,15 +63,22 @@ def _speakers_schema(defaults: dict) -> vol.Schema:
     )
 
 
+_NO_SOUNDS_PLACEHOLDER = SelectOptionDict(
+    value="",
+    label="— Upload eerst MP3-bestanden naar /config/www/nida_dua/sounds/ —",
+)
+
+
 def _duas_schema(defaults: dict, available_sounds: list[str]) -> vol.Schema:
     sound_options = [SelectOptionDict(value=f, label=f) for f in available_sounds]
     fields: dict = {}
     for key, meta in DUAS.items():
         fields[vol.Optional(conf_dua_enabled(key), default=defaults.get(conf_dua_enabled(key), True))] = BooleanSelector()
         preferred = meta["sound"]
-        # Gebruik de meta-default alleen als dat bestand ook echt beschikbaar is
-        default_sound = defaults.get(conf_dua_sound(key)) or (preferred if preferred in available_sounds else "")
-        options = sound_options or [SelectOptionDict(value=preferred, label=preferred)]
+        # Gebruik opgeslagen waarde, of meta-default alleen als het bestand echt bestaat
+        saved = defaults.get(conf_dua_sound(key), "")
+        default_sound = saved if saved in available_sounds else (preferred if preferred in available_sounds else "")
+        options = sound_options if sound_options else [_NO_SOUNDS_PLACEHOLDER]
         fields[vol.Optional(conf_dua_sound(key), default=default_sound)] = SelectSelector(
             SelectSelectorConfig(options=options, mode=SelectSelectorMode.DROPDOWN, custom_value=True)
         )
