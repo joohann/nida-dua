@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import socket
 
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
@@ -23,15 +24,34 @@ _LOGGER = logging.getLogger(__name__)
 _SOUND_BASE = "/local/nida_dua/sounds"
 
 
+def _lan_ip() -> str:
+    """Geef het echte LAN-IP van de HA-server terug via socket-trick."""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return ""
+
+
 def get_sound_url(hass: HomeAssistant, filename: str) -> str:
-    """Bouw de volledige lokale URL voor een geluidsbestand."""
-    base = (hass.config.internal_url or hass.config.external_url or "").rstrip("/")
-    if not base and hass.config.api:
-        api = hass.config.api
-        scheme = "https" if api.use_ssl else "http"
-        base = f"{scheme}://{api.host}:{api.port}"
-    if not base:
-        base = "http://homeassistant.local:8123"
+    """Bouw de volledige lokale URL voor een geluidsbestand.
+
+    internal_url / external_url kan '0.0.0.0' bevatten (luisteradres van HA),
+    wat Sonos niet kan bereiken. Gebruik dan het echte LAN-IP via socket.
+    """
+    port = hass.config.api.port if hass.config.api else 8123
+    use_ssl = hass.config.api.use_ssl if hass.config.api else False
+    scheme = "https" if use_ssl else "http"
+
+    for candidate in [hass.config.internal_url, hass.config.external_url]:
+        if candidate and "0.0.0.0" not in candidate:
+            return f"{candidate.rstrip('/')}{_SOUND_BASE}/{filename}"
+
+    ip = _lan_ip()
+    base = f"{scheme}://{ip}:{port}" if ip else f"{scheme}://homeassistant.local:{port}"
     return f"{base}{_SOUND_BASE}/{filename}"
 
 
