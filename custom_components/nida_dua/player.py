@@ -72,6 +72,13 @@ async def async_play_dua(
     for entity_id in speakers:
         try:
             await hass.services.async_call(
+                "media_player", "media_stop", {"entity_id": entity_id}, blocking=True,
+            )
+        except Exception:
+            pass  # niet alle spelers ondersteunen stop; ga door
+
+        try:
+            await hass.services.async_call(
                 "media_player",
                 "volume_set",
                 {"entity_id": entity_id, "volume_level": volume},
