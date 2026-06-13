@@ -80,7 +80,7 @@ class DuaSwitch(SwitchEntity):
         speakers = opts.get(CONF_SPEAKER, [])
         volume = get_current_volume(opts)
 
-        filename = opts.get(conf_dua_sound(self._dua_key), self._meta["sound"])
+        filename = opts.get(conf_dua_sound(self._dua_key)) or self._meta["sound"]
         sound_url = get_sound_url(self._hass, filename)
         _LOGGER.debug("Dua switch aan: '%s' op %s", self._dua_key, speakers)
         await async_play_dua(self._hass, speakers, sound_url, volume)

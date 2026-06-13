@@ -68,9 +68,11 @@ def _duas_schema(defaults: dict, available_sounds: list[str]) -> vol.Schema:
     fields: dict = {}
     for key, meta in DUAS.items():
         fields[vol.Optional(conf_dua_enabled(key), default=defaults.get(conf_dua_enabled(key), True))] = BooleanSelector()
-        default_sound = meta["sound"]
-        options = sound_options if sound_options else [SelectOptionDict(value=default_sound, label=default_sound)]
-        fields[vol.Optional(conf_dua_sound(key), default=defaults.get(conf_dua_sound(key), default_sound))] = SelectSelector(
+        preferred = meta["sound"]
+        # Gebruik de meta-default alleen als dat bestand ook echt beschikbaar is
+        default_sound = defaults.get(conf_dua_sound(key)) or (preferred if preferred in available_sounds else "")
+        options = sound_options or [SelectOptionDict(value=preferred, label=preferred)]
+        fields[vol.Optional(conf_dua_sound(key), default=default_sound)] = SelectSelector(
             SelectSelectorConfig(options=options, mode=SelectSelectorMode.DROPDOWN, custom_value=True)
         )
     return vol.Schema(fields)
