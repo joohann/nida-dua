@@ -27,4 +27,4 @@ DUAS: dict[str, dict] = {
 }
 
 DEFAULT_VOLUME = 0.4
-DEFAULT_SPEAKER = "media_player.adhan_speakers"
+DEFAULT_SPEAKER: list[str] = []

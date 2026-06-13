@@ -72,9 +72,8 @@ class DuaSwitch(SwitchEntity):
         self.async_write_ha_state()
 
         opts = self._entry.options or self._entry.data
-        speakers_raw = opts.get(CONF_SPEAKER, "")
-        speakers = [s.strip() for s in speakers_raw.split(",")] if speakers_raw else []
-        volume = int(opts.get(CONF_VOLUME, DEFAULT_VOLUME * 100)) / 100
+        speakers = opts.get(CONF_SPEAKER, [])
+        volume = float(opts.get(CONF_VOLUME, DEFAULT_VOLUME * 100)) / 100
 
         sound_url = get_sound_url(self._hass, self._meta["sound"])
         _LOGGER.debug("Dua switch aan: '%s' op %s", self._dua_key, speakers)
