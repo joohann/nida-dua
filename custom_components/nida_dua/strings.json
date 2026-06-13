@@ -16,8 +16,10 @@
       "duas": {
         "title": "Nida Dua — Welke duas wil je gebruiken?",
         "data": {
-          "enabled_sleep": "Slaap dua",
-          "enabled_enter_home": "Binnenkomen huis dua"
+          "enabled_sleep": "Slaap dua inschakelen",
+          "sound_sleep": "MP3 voor slaap dua",
+          "enabled_enter_home": "Binnenkomen huis dua inschakelen",
+          "sound_enter_home": "MP3 voor binnenkomen huis dua"
         }
       }
     },
@@ -41,8 +43,10 @@
       "duas": {
         "title": "Nida Dua — Welke duas wil je gebruiken?",
         "data": {
-          "enabled_sleep": "Slaap dua",
-          "enabled_enter_home": "Binnenkomen huis dua"
+          "enabled_sleep": "Slaap dua inschakelen",
+          "sound_sleep": "MP3 voor slaap dua",
+          "enabled_enter_home": "Binnenkomen huis dua inschakelen",
+          "sound_enter_home": "MP3 voor binnenkomen huis dua"
         }
       }
     }

@@ -1,10 +1,12 @@
 """Nida Dua — config flow."""
 from __future__ import annotations
 
+import os
+
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.selector import (
     BooleanSelector,
     EntitySelector,
@@ -12,6 +14,10 @@ from homeassistant.helpers.selector import (
     NumberSelector,
     NumberSelectorConfig,
     NumberSelectorMode,
+    SelectOptionDict,
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
 )
 
 from .const import (
@@ -29,9 +35,17 @@ from .const import (
     DOMAIN,
     DUAS,
     conf_dua_enabled,
+    conf_dua_sound,
 )
 
 _NUM = lambda mn, mx: NumberSelector(NumberSelectorConfig(min=mn, max=mx, step=1, mode=NumberSelectorMode.SLIDER))
+
+
+def _list_sounds(hass: HomeAssistant) -> list[str]:
+    sounds_dir = hass.config.path("www", "nida_dua", "sounds")
+    if not os.path.isdir(sounds_dir):
+        return []
+    return sorted(f for f in os.listdir(sounds_dir) if f.endswith(".mp3"))
 
 
 def _speakers_schema(defaults: dict) -> vol.Schema:
@@ -49,13 +63,17 @@ def _speakers_schema(defaults: dict) -> vol.Schema:
     )
 
 
-def _duas_schema(defaults: dict) -> vol.Schema:
-    return vol.Schema(
-        {
-            vol.Optional(conf_dua_enabled(key), default=defaults.get(conf_dua_enabled(key), True)): BooleanSelector()
-            for key in DUAS
-        }
-    )
+def _duas_schema(defaults: dict, available_sounds: list[str]) -> vol.Schema:
+    sound_options = [SelectOptionDict(value=f, label=f) for f in available_sounds]
+    fields: dict = {}
+    for key, meta in DUAS.items():
+        fields[vol.Optional(conf_dua_enabled(key), default=defaults.get(conf_dua_enabled(key), True))] = BooleanSelector()
+        default_sound = meta["sound"]
+        options = sound_options if sound_options else [SelectOptionDict(value=default_sound, label=default_sound)]
+        fields[vol.Optional(conf_dua_sound(key), default=defaults.get(conf_dua_sound(key), default_sound))] = SelectSelector(
+            SelectSelectorConfig(options=options, mode=SelectSelectorMode.DROPDOWN, custom_value=True)
+        )
+    return vol.Schema(fields)
 
 
 class NidaDuaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -76,7 +94,8 @@ class NidaDuaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             await self.async_set_unique_id(DOMAIN)
             self._abort_if_unique_id_configured()
             return self.async_create_entry(title="Nida Dua", data=self._data)
-        return self.async_show_form(step_id="duas", data_schema=_duas_schema({}))
+        available = await self.hass.async_add_executor_job(_list_sounds, self.hass)
+        return self.async_show_form(step_id="duas", data_schema=_duas_schema({}, available))
 
     @staticmethod
     @callback
@@ -102,4 +121,5 @@ class NidaDuaOptionsFlow(config_entries.OptionsFlow):
         if user_input is not None:
             self._data.update(user_input)
             return self.async_create_entry(title="", data=self._data)
-        return self.async_show_form(step_id="duas", data_schema=_duas_schema(self._current()))
+        available = await self.hass.async_add_executor_job(_list_sounds, self.hass)
+        return self.async_show_form(step_id="duas", data_schema=_duas_schema(self._current(), available))

@@ -38,3 +38,7 @@ DEFAULT_SPEAKER: list[str] = []
 
 def conf_dua_enabled(dua_key: str) -> str:
     return f"enabled_{dua_key}"
+
+
+def conf_dua_sound(dua_key: str) -> str:
+    return f"sound_{dua_key}"

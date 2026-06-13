@@ -14,7 +14,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import CONF_SPEAKER, DOMAIN, DUAS, conf_dua_enabled
+from .const import CONF_SPEAKER, DOMAIN, DUAS, conf_dua_enabled, conf_dua_sound
 from .player import async_play_dua, get_current_volume, get_sound_url
 
 _LOGGER = logging.getLogger(__name__)
@@ -80,7 +80,8 @@ class DuaSwitch(SwitchEntity):
         speakers = opts.get(CONF_SPEAKER, [])
         volume = get_current_volume(opts)
 
-        sound_url = get_sound_url(self._hass, self._meta["sound"])
+        filename = opts.get(conf_dua_sound(self._dua_key), self._meta["sound"])
+        sound_url = get_sound_url(self._hass, filename)
         _LOGGER.debug("Dua switch aan: '%s' op %s", self._dua_key, speakers)
         await async_play_dua(self._hass, speakers, sound_url, volume)
 
